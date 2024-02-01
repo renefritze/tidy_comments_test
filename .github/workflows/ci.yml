@@ -17,8 +17,7 @@ jobs:
         git fetch --no-tags --no-recurse-submodules upstream "${{ github.event.pull_request.base.ref }}"
     - name: Install clang-tidy
       run: |
-        sudo apt-get update
-        sudo apt-get install -y clang-tidy
+        pipx install clang-tidy --suffix=_ci
     - name: Prepare compile_commands.json
       run: |
         cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
@@ -27,7 +26,7 @@ jobs:
     - name: Analyze
       run: |
          # git diff -U0 "$(git merge-base HEAD "upstream/${{ github.event.pull_request.base.ref }}")" | clang-tidy-diff -p1 -path build -export-fixes clang-tidy-result/fixes.yml
-         clang-tidy -p build -export-fixes clang-tidy-result/fixes.yml
+         clang-tidy_ci -p build -export-fixes clang-tidy-result/fixes.yml
     - name: Run clang-tidy-pr-comments action
       uses: platisd/clang-tidy-pr-comments@v1
       with:
