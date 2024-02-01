@@ -1,9 +1,6 @@
 on:
   pull_request:
-  push:
-    branches:
-    - main
-     
+
 jobs:
   clang-tidy:
     runs-on: ubuntu-22.04
@@ -26,8 +23,7 @@ jobs:
       run: |
         cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
     - name: Create results directory
-      run: |
-        mkdir clang-tidy-result
+      run: mkdir clang-tidy-result
     - name: Analyze
       run: |
          # git diff -U0 "$(git merge-base HEAD "upstream/${{ github.event.pull_request.base.ref }}")" | clang-tidy-diff -p1 -path build -export-fixes clang-tidy-result/fixes.yml
