@@ -29,6 +29,7 @@ jobs:
          clang-tidy_ci -p build -export-fixes clang-tidy-result/fixes.yml comments_test.cpp
     - name: Run clang-tidy-pr-comments action
       uses: platisd/clang-tidy-pr-comments@v1
+      if: always()
       with:
         # The GitHub token (or a personal access token)
         github_token: ${{ secrets.GITHUB_TOKEN }}
