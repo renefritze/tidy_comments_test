@@ -1,35 +1,88 @@
 ---
-Checks:          'clang-diagnostic-*,clang-analyzer-*'
-WarningsAsErrors: ''
-HeaderFileExtensions:
-  - ''
-  - h
-  - hh
-  - hpp
-  - hxx
-ImplementationFileExtensions:
-  - c
-  - cc
-  - cpp
-  - cxx
-HeaderFilterRegex: ''
-AnalyzeTemporaryDtors: false
-FormatStyle:     none
-User:            rene
-CheckOptions:
-  cert-dcl16-c.NewSuffixes: 'L;LL;LU;LLU'
-  google-readability-namespace-comments.ShortNamespaceLines: '10'
-  cert-err33-c.CheckedFunctions: '::aligned_alloc;::asctime_s;::at_quick_exit;::atexit;::bsearch;::bsearch_s;::btowc;::c16rtomb;::c32rtomb;::calloc;::clock;::cnd_broadcast;::cnd_init;::cnd_signal;::cnd_timedwait;::cnd_wait;::ctime_s;::fclose;::fflush;::fgetc;::fgetpos;::fgets;::fgetwc;::fopen;::fopen_s;::fprintf;::fprintf_s;::fputc;::fputs;::fputwc;::fputws;::fread;::freopen;::freopen_s;::fscanf;::fscanf_s;::fseek;::fsetpos;::ftell;::fwprintf;::fwprintf_s;::fwrite;::fwscanf;::fwscanf_s;::getc;::getchar;::getenv;::getenv_s;::gets_s;::getwc;::getwchar;::gmtime;::gmtime_s;::localtime;::localtime_s;::malloc;::mbrtoc16;::mbrtoc32;::mbsrtowcs;::mbsrtowcs_s;::mbstowcs;::mbstowcs_s;::memchr;::mktime;::mtx_init;::mtx_lock;::mtx_timedlock;::mtx_trylock;::mtx_unlock;::printf_s;::putc;::putwc;::raise;::realloc;::remove;::rename;::scanf;::scanf_s;::setlocale;::setvbuf;::signal;::snprintf;::snprintf_s;::sprintf;::sprintf_s;::sscanf;::sscanf_s;::strchr;::strerror_s;::strftime;::strpbrk;::strrchr;::strstr;::strtod;::strtof;::strtoimax;::strtok;::strtok_s;::strtol;::strtold;::strtoll;::strtoul;::strtoull;::strtoumax;::strxfrm;::swprintf;::swprintf_s;::swscanf;::swscanf_s;::thrd_create;::thrd_detach;::thrd_join;::thrd_sleep;::time;::timespec_get;::tmpfile;::tmpfile_s;::tmpnam;::tmpnam_s;::tss_create;::tss_get;::tss_set;::ungetc;::ungetwc;::vfprintf;::vfprintf_s;::vfscanf;::vfscanf_s;::vfwprintf;::vfwprintf_s;::vfwscanf;::vfwscanf_s;::vprintf_s;::vscanf;::vscanf_s;::vsnprintf;::vsnprintf_s;::vsprintf;::vsprintf_s;::vsscanf;::vsscanf_s;::vswprintf;::vswprintf_s;::vswscanf;::vswscanf_s;::vwprintf_s;::vwscanf;::vwscanf_s;::wcrtomb;::wcschr;::wcsftime;::wcspbrk;::wcsrchr;::wcsrtombs;::wcsrtombs_s;::wcsstr;::wcstod;::wcstof;::wcstoimax;::wcstok;::wcstok_s;::wcstol;::wcstold;::wcstoll;::wcstombs;::wcstombs_s;::wcstoul;::wcstoull;::wcstoumax;::wcsxfrm;::wctob;::wctrans;::wctype;::wmemchr;::wprintf_s;::wscanf;::wscanf_s;'
-  llvm-else-after-return.WarnOnUnfixable: 'false'
-  cert-str34-c.DiagnoseSignedUnsignedCharComparisons: 'false'
-  google-readability-namespace-comments.SpacesBeforeComments: '2'
-  cppcoreguidelines-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic: 'true'
-  google-readability-braces-around-statements.ShortStatementLines: '1'
-  google-readability-function-size.StatementThreshold: '800'
-  llvm-qualified-auto.AddConstToQualified: 'false'
-  llvm-else-after-return.WarnOnConditionVariables: 'false'
-  cert-oop54-cpp.WarnOnlyIfThisHasSuspiciousField: 'false'
-SystemHeaders:   false
-...
+# Note the tests subdir has a sub-config that disables some checks.
 
-Resource filename: /home/rene/.local/pipx/venvs/clang-tidy/lib/python3.11/site-packages/clang_tidy/data/bin/clang-tidy 
+HeaderFilterRegex: (src|tests|examples)/.*
+WarningsAsErrors: '*,-clang-diagnostic-unused-function'
+Checks: >
+  Enable all warnings by default. This ensures we don't miss new and useful
+  warnings when a new version of clang-tidy is dropped.
+
+  IMPORTANT
+  clang-tidy doesn't support comments but we can simulate comments by just
+  writing text directly here. These are then interpreted as warnings and will
+  be dropped. As long as you start every sentence with a capital letter and
+  don't use commas in your "comments" you should be fine,
+  *,
+
+  Warnings that are rarely useful,
+  -altera-*, Checks related to OpenCL programming for FPGAs. Not relevant,
+  -abseil-*, We're not using Abseil,
+  -android-*,
+  -fuchsia-*, Fuchsia specific,
+  -zircon-*, Zircon specific,
+  -linuxkernel*,
+  -mpi-*,
+  -objc-*, Objective-c not relevant,
+  -llvmlibc-*, We want to use glibc,
+  -misc-include-cleaner, Looks useful but redundant with IWYU. We may replace IWYU with this one day,
+  -misc-misplaced-const,
+  -misc-no-recursion,
+
+  These don't match our general guidance,
+  -modernize-use-trailing-return-type,
+  -google-readability-braces-around-statements,
+  -readability-identifier-length,
+  This warns even for 'using namespace' in a .cpp file. We don't want that,
+  -google-build-using-namespace,
+
+  These warrant more discussion,
+  -cppcoreguidelines-avoid-const-or-ref-data-members,
+  -bugprone-easily-swappable-parameters,
+  -readability-avoid-const-params-in-decls,
+  -readability-function-cognitive-complexity,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
+  -misc-non-private-member-variables-in-classes, This should be a duplicate of the above?,
+
+
+  Cannot use due a bug in clang-tidy (https://github.com/llvm/llvm-project/issues/52682),
+  -llvm-header-guard,
+
+  Aliases. These are just duplicates of other warnings and should always be ignored,
+  -bugprone-narrowing-conversions,
+  -cert-dcl37-c,
+  -cert-dcl51-cpp,
+  -cert-exp42-c,
+  -cert-flp37-c,
+  -cert-msc24-c,
+  -cert-msc33-c,
+  -readability-magic-numbers,
+  -google-readability-function-size,
+  -hicpp-function-size,
+  -llvm-else-after-return,
+  -hicpp-braces-around-statements,
+  -readability-braces-around-statements,
+
+  These should be enabled, but have too many hits that need fixing in follow-up PRs,
+  -modernize-use-nodiscard,
+  -modernize-return-braced-init-list,
+  -misc-const-correctness,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -readability-container-size-empty,
+  -modernize-pass-by-value,
+  -google-explicit-constructor,
+  -clang-diagnostic-unused-variable,
+  -cppcoreguidelines-special-member-functions,
+  -performance-avoid-endl,
+  -modernize-use-auto,
+  -hicpp-special-member-functions,
+  -hicpp-explicit-conversions,
+  -hicpp-use-auto,
+
+
+
+  This warns for any TODO left in source and could be useful,
+  -google-readability-todo,
+
+
+# clang-tidy can auto-run clang-format for us. Tell it which style to use.
+FormatStyle: file
