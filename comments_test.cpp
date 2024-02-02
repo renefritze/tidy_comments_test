@@ -1,4 +1,4 @@
 
-double return_42() { return 42; }
+auto return_42() -> double { return 42; }
 
 int main() { return return_42(); }
