@@ -1,5 +1,3 @@
-int main()
+double return_42() { return 42; }
 
-{
-  return 0;
-}
+int main() { return return_42(); }
