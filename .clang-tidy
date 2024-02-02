@@ -1,0 +1,6 @@
+---
+
+WarningsAsErrors: '*,-clang-diagnostic-unused-function'
+Checks: >
+  *,
+  -llvm*

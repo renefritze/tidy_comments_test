@@ -1,0 +1,44 @@
+on:
+  pull_request:
+
+jobs:
+  clang-tidy:
+    runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: write
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        fetch-depth: 0
+    - name: Fetch base branch
+      run: |
+        git remote add upstream "https://github.com/${{ github.event.pull_request.base.repo.full_name }}"
+        git fetch --no-tags --no-recurse-submodules upstream "${{ github.event.pull_request.base.ref }}"
+    - name: Install clang-tidy
+      run: |
+        pipx install clang-tidy --suffix=_ci
+    - name: Prepare compile_commands.json
+      run: |
+        cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+    - name: Create results directory
+      run: mkdir clang-tidy-result
+    - name: Analyze
+      run: |
+         # git diff -U0 "$(git merge-base HEAD "upstream/${{ github.event.pull_request.base.ref }}")" | clang-tidy-diff -p1 -path build -export-fixes clang-tidy-result/fixes.yml
+         clang-tidy_ci -p build -export-fixes clang-tidy-result/fixes.yml comments_test.cpp
+    - name: Run clang-tidy-pr-comments action
+      uses: platisd/clang-tidy-pr-comments@v1
+      if: always()
+      with:
+        # The GitHub token (or a personal access token)
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        # The path to the clang-tidy fixes generated previously
+        clang_tidy_fixes: clang-tidy-result/fixes.yml
+        # Optionally set to true if you want the Action to request
+        # changes in case warnings are found
+        request_changes: true
+        # Optionally set the number of comments per review
+        # to avoid GitHub API timeouts for heavily loaded
+        # pull requests
+        suggestions_per_comment: 10
