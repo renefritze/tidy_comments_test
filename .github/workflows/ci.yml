@@ -25,6 +25,7 @@ jobs:
       run: mkdir clang-tidy-result
     - name: Analyze
       run: |
+         touch clang-tidy-result/fixes.yml
          # git diff -U0 "$(git merge-base HEAD "upstream/${{ github.event.pull_request.base.ref }}")" | clang-tidy-diff -p1 -path build -export-fixes clang-tidy-result/fixes.yml
          clang-tidy_ci -p build -export-fixes clang-tidy-result/fixes.yml comments_test.cpp
     - name: Run clang-tidy-pr-comments action
