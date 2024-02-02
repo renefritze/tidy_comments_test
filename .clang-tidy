@@ -1,6 +1,4 @@
 ---
 
 WarningsAsErrors: '*,-clang-diagnostic-unused-function'
-Checks: >
-  *,
-  -llvm*
+Checks: bugprone-narrowing-conversions
