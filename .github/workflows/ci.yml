@@ -6,6 +6,7 @@ jobs:
     runs-on: ubuntu-22.04
     permissions:
       pull-requests: write
+      contents: write
     steps:
     - uses: actions/checkout@v4
       with:
@@ -42,3 +43,4 @@ jobs:
         # to avoid GitHub API timeouts for heavily loaded
         # pull requests
         suggestions_per_comment: 10
+        auto_resolve_conversations: true
