@@ -42,3 +42,4 @@ jobs:
         # to avoid GitHub API timeouts for heavily loaded
         # pull requests
         suggestions_per_comment: 10
+        auto_resolve_conversations: true
